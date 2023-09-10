@@ -74,7 +74,7 @@ persistence:
   imageChartStorage:
     disableredirect: false
 # Harbar Admin Password
-harborAdminPassword: "Harbor12345"
+harborAdminPassword: "dbISjNrHDgt0"
 # Harbor module replicas
 portal:
   replicas: 1
@@ -97,10 +97,10 @@ notary:
 database:
   type: external
   external:
-    host: "192.168.1.95"
+    host: "192.168.1.195"
     port: "5432"
-    username: "u0" # "harboruser201" 
-    password: "foobar"   # "harborpwd201" 
+    username: "u0"
+    password: "foobar"
     coreDatabase: "registry"
     notaryServerDatabase: "notary_server"
     notarySignerDatabase: "notary_signer"
