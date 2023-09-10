@@ -1,0 +1,111 @@
+expose:
+  type: ingress
+  tls:
+    # enabled: true
+    # certSource: secret
+    # auto:
+    #   commonName: "harbor-registry.fano.ai"
+    secret:
+      secretName: "harbor-secret.fano.ai"
+      notarySecretName: "harbor-secret.fano.ai"
+  # Habror Ingress
+  ingress:
+    hosts:
+      core: harbor-registry.fano.ai
+      notary: harbor-notary.fano.ai
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      ingress.kubernetes.io/ssl-redirect: "true"
+      ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/auth-keepalive: "75"
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header Host $host;
+      nginx.ingress.kubernetes.io/client-body-buffer-size: 500m
+      nginx.ingress.kubernetes.io/client-header-buffer-size: 10m
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/large-client-header-buffers: 4 10240k
+      nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+      nginx.ingress.kubernetes.io/proxy-buffer: 32 32k
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 5m
+      nginx.ingress.kubernetes.io/proxy-buffering: "on"
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "16"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "1800"
+      nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 1024m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
+      nginx.ingress.kubernetes.io/ssl-passthrough: "false"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false" # "true"
+      nginx.org/client-max-body-size: "1024m"
+externalURL: https://harbor-registry.fano.ai
+# Harbor Certificate for internal components
+internalTLS:  
+  enabled: true
+  certSource: "auto"
+persistence:
+  enabled: true
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+    registry:
+      storageClass: "managed-nfs-storage"
+      accessMode: ReadWriteMany
+      size: 5Gi
+    chartmuseum:
+      storageClass: "managed-nfs-storage"
+      accessMode: ReadWriteMany
+      size: 5Gi
+    jobservice:
+      jobLog:
+        storageClass: "managed-nfs-storage"
+        accessMode: ReadWriteMany
+        size: 1Gi
+    database:
+      storageClass: "managed-nfs-storage"
+      accessMode: ReadWriteMany
+      size: 1Gi
+    redis:
+      storageClass: "managed-nfs-storage"
+      accessMode: ReadWriteMany
+      size: 1Gi
+    trivy:
+      storageClass: "managed-nfs-storage"
+      accessMode: ReadWriteMany
+      size: 5Gi
+  # Define which storage backend is used for registry to store images and charts.
+  imageChartStorage:
+    disableredirect: false
+# Harbar Admin Password
+harborAdminPassword: "Harbor12345"
+# Harbor module replicas
+portal:
+  replicas: 1
+core:
+  replicas: 1
+jobservice:
+  replicas: 1
+registry:
+  replicas: 1
+chartmuseum:
+  replicas: 1
+trivy:
+  replicas: 1
+notary:
+  server:
+    replicas: 1
+  signer:
+    replicas: 1
+# Use external databases
+database:
+  type: external
+  external:
+    host: "192.168.1.95"
+    port: "5432"
+    username: "u0" # "harboruser201" 
+    password: "foobar"   # "harborpwd201" 
+    coreDatabase: "registry"
+    notaryServerDatabase: "notary_server"
+    notarySignerDatabase: "notary_signer"
+    # existingSecret: ""
+    # sslmode: "disable"
+# Open metrics
+metrics:
+  enabled: true
